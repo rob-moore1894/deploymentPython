@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+    <a href="/logout" style="position: fixed; right: 2rem; top: 1rem;"><button class="btn btn-primary">Logout</button></a>
+    <a href="/myaccount/{{loggedInUser.id}}" style="position: fixed; right: 8rem; top: 1.5rem;">Edit My Account</a>
+    <h1 class="mt-3">Welcome {{loggedInUser.first_name}} {{loggedInUser.last_name}}!</h1>
+    <div class="container">
+        <div class="row">
+            <div class="quotes col-5 mt-3">
+                <h2 class="text-center">Quotes</h2>
+                {% for quote in all_quotes %}
+                <div class="quote-box border p-2 mb-3">
+                    {{quote.author}}: "{{quote.content}}" <br />
+                    Posted by: <a href="/user/{{quote.uploader.id}}">{{quote.uploader.first_name}} {{quote.uploader.last_name}}</a><br />
+                    {% if quote.favoriters.all.count == 1%}
+                        1 person likes this<br />
+                    {% else %}
+                        {{quote.favoriters.all.count}} people like this<br />
+                    {% endif %}
+                    <div class="offset-9">
+                        <a href="/like/{{quote.id}}"><button class="btn btn-primary">Like</button></a>
+                    </div>
+                    {% if quote.uploader.id == loggedInUser.id %}
+                    <div><a href="/delete/{{quote.id}}">Delete</a></div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <div class="col-1"></div>
+            <div class="add-a-quote col-5 mt-3">
+                <h2 class="text-center">Add A Quote!</h2>
+                <form action="/addQuote" method="POST">
+                    {%csrf_token%}
+                    <div class="form-group row">
+                        <label for="author" class="col-3">Author</label>
+                        <input type="text" class="col-6" name="author">
+                    </div>
+                    <div class="form-group row">
+                        <label for="quote" class="col-3">Quote</label>
+                        <textarea type="text" class="col-6" name="quote" overflow: auto></textarea>
+                    </div>
+                    <div class="form-group row">
+                        <div class="offset-2">
+                            <button type="submit" class="btn btn-primary offset-8">Add</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="errors">
+                    {% if messages %}
+                    <ul>
+                        {% for message in messages %}
+                        <li>{{message}}</li>
+                        {% endfor%}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
